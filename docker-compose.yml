@@ -1,0 +1,80 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: hr_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-hr_grievance}
+      POSTGRES_USER: ${POSTGRES_USER:-hr_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+      - ./backend/migrations/002_google_sso.sql:/docker-entrypoint-initdb.d/002_google_sso.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hr_user} -d ${POSTGRES_DB:-hr_grievance}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hr_backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+    expose:
+      - "3001"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
+    container_name: hr_frontend
+    restart: unless-stopped
+    networks:
+      - internal
+    expose:
+      - "80"
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: hr_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - internal
+      - external
+
+volumes:
+  postgres_data:
+  nginx_logs:
+
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge
