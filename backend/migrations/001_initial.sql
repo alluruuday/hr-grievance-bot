@@ -241,5 +241,5 @@ CREATE TRIGGER trg_tickets_updated       BEFORE UPDATE ON tickets        FOR EAC
 -- ─── DEFAULT ADMIN USER (change password immediately!) ──────────────────────
 INSERT INTO users (employee_id, name, email, password_hash, role) VALUES
   ('ADMIN001', 'System Admin', 'admin@company.com',
-   '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS8G.zy',  -- password: Admin@1234
+   '$2a$12$RPNX1HfE1xSZcDUAzTNGSuxLZk0TeEN.Ue.CcLGRW8.BeE1O/pX8S',  -- password: Admin@1234
    'admin');

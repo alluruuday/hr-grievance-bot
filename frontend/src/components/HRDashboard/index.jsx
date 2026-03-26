@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import api from '../../services/api';
+import { analytics, tickets as ticketsApi } from '../../services/api';
 
 const S = {
   page: { padding: '32px 40px', maxWidth: 1100, margin: '0 auto' },
@@ -57,12 +57,12 @@ export default function HRDashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/analytics/summary'),
-      api.get('/tickets?limit=8&sort=created_at&order=desc'),
+      analytics.summary(),
+      ticketsApi.list({ limit: 8 }),
     ])
       .then(([s, t]) => {
-        setSummary(s.data);
-        setRecentTickets(t.data?.tickets || t.data || []);
+        setSummary(s);
+        setRecentTickets(Array.isArray(t) ? t : (t?.tickets || []));
       })
       .catch(console.error)
       .finally(() => setLoading(false));

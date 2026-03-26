@@ -1,0 +1,27 @@
+version: "3.9"
+
+# Production override — host Nginx handles SSL/routing, so we skip the nginx container
+# and expose backend + frontend directly on host ports.
+
+services:
+  postgres:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/migrations/001_initial.sql:/docker-entrypoint-initdb.d/001_initial.sql:ro
+      - ./backend/migrations/002_google_sso.sql:/docker-entrypoint-initdb.d/002_google_sso.sql:ro
+      - ./backend/migrations/003_seed_hr_head.sql:/docker-entrypoint-initdb.d/003_seed_hr_head.sql:ro
+
+  backend:
+    ports:
+      - "3001:3001"
+    environment:
+      POSTGRES_HOST: postgres
+      NODE_ENV: production
+
+  frontend:
+    ports:
+      - "5174:80"
+
+  nginx:
+    profiles:
+      - donotstart
