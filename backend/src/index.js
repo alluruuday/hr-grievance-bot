@@ -29,6 +29,7 @@ app.use('/api/chat',      require('./routes/chat'));
 app.use('/api/tickets',   require('./routes/tickets'));
 app.use('/api/knowledge', require('./routes/knowledge'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/users',     require('./routes/users'));
 
 // ─── 404 ─────────────────────────────────────────────────────────────────────
 app.use((req, res) => res.status(404).json({ error: 'Not found' }));

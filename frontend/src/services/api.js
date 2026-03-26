@@ -83,3 +83,10 @@ export const analytics = {
   summary:    (params = {}) => request(`/analytics/summary?${new URLSearchParams(params)}`),
   timeSeries: (params = {}) => request(`/analytics/tickets?${new URLSearchParams(params)}`),
 };
+
+// ─── Users (admin) ────────────────────────────────────────────────────────────
+export const users = {
+  list:       (params = {}) => request(`/users?${new URLSearchParams(params)}`),
+  update:     (id, body)    => request(`/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+  deactivate: (id)          => request(`/users/${id}`, { method: 'DELETE' }),
+};

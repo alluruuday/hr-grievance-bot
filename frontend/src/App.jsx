@@ -7,6 +7,7 @@ import TicketList from './components/TicketList';
 import AdminPanel from './components/AdminPanel';
 import AnalyticsDashboard from './components/Analytics';
 import HRDashboard from './components/HRDashboard';
+import UserManagement from './components/UserManagement';
 
 const NAV_STYLES = {
   nav: { background: '#fff', borderBottom: '1px solid #f0f0f0', padding: '0 24px', display: 'flex', alignItems: 'center', height: 60, position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 8px rgba(0,0,0,0.04)' },
@@ -32,6 +33,7 @@ function NavBar() {
         {isHR && <NavLink to="/dashboard" style={({ isActive }) => ({ ...NAV_STYLES.link, ...(isActive ? NAV_STYLES.activeLink : {}) })}>Dashboard</NavLink>}
         {isHR && <NavLink to="/knowledge" style={({ isActive }) => ({ ...NAV_STYLES.link, ...(isActive ? NAV_STYLES.activeLink : {}) })}>Knowledge Base</NavLink>}
         {isHR && <NavLink to="/analytics" style={({ isActive }) => ({ ...NAV_STYLES.link, ...(isActive ? NAV_STYLES.activeLink : {}) })}>Analytics</NavLink>}
+        {user?.role === 'admin' && <NavLink to="/users" style={({ isActive }) => ({ ...NAV_STYLES.link, ...(isActive ? NAV_STYLES.activeLink : {}) })}>Users</NavLink>}
       </div>
       <div style={NAV_STYLES.user}>
         <div style={NAV_STYLES.avatar}>{user?.name?.[0]?.toUpperCase()}</div>
@@ -101,6 +103,11 @@ export default function App() {
           <Route path="/analytics" element={
             <ProtectedRoute minRole="hrbp">
               <AppLayout><AnalyticsDashboard /></AppLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/users" element={
+            <ProtectedRoute minRole="admin">
+              <AppLayout><UserManagement /></AppLayout>
             </ProtectedRoute>
           } />
           <Route path="*" element={<DefaultRedirect />} />
